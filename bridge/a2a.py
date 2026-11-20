@@ -184,6 +184,14 @@ class Config:
         self.path = path
         raw = tomllib.loads(path.read_text()) if path.exists() else {}
         self.relays: list[str] = raw.get("relays", [])
+        # Fallback relays — any relay the user chooses (public, own, local). Always read;
+        # written per fallback_mode.
+        self.fallback_relays: list[str] = raw.get("fallback_relays", [])
+        self.fallback_mode: str = raw.get("fallback_mode", "on-failure")
+        if self.fallback_mode not in ("on-failure", "always", "off"):
+            raise ValueError("fallback_mode must be on-failure | always | off")
+        if self.fallback_mode == "off":
+            self.fallback_relays = []
         self.state = expand(raw.get("state_dir", "~/.local/share/nostr-a2a"))
         self.agents: dict[str, dict] = raw.get("agents", {})
         self.peers: dict[str, dict] = {}
@@ -315,34 +323,72 @@ class Bridge:
             # read loop has to be free to receive.
             await self.events.put((url, msg[2]))
         elif msg[0] == "OK":
-            fut = self.pending_ok.get(msg[1])
+            fut = self.pending_ok.get((url, msg[1]))
             if fut and not fut.done():
-                fut.set_result((msg[2], msg[3] if len(msg) > 3 else ""))
+                fut.set_result((bool(msg[2]), msg[3] if len(msg) > 3 else ""))
         elif msg[0] == "NOTICE":
             log.info("notice from %s: %s", url, msg[1])
 
-    async def publish(self, ev: dict) -> tuple[bool, str]:
-        """Send to every connected relay; success if any accepts."""
-        if not self.conns:
-            return False, "no relay connected (queued, will retry)"
-        fut = asyncio.get_running_loop().create_future()
-        self.pending_ok[ev["id"]] = fut
-        for ws in list(self.conns.values()):
+    async def _send_to(self, urls: list[str], ev: dict, timeout: float = 15) -> tuple[str | None, str]:
+        """Send to the given connected relays; return (url that accepted, reasons) — url None if none did."""
+        loop = asyncio.get_running_loop()
+        futs = {}
+        for u in urls:
+            ws = self.conns.get(u)
+            if not ws:
+                continue
+            futs[u] = self.pending_ok[(u, ev["id"])] = loop.create_future()
             with contextlib.suppress(Exception):
                 await ws.send(json.dumps(["EVENT", ev]))
+        reasons = []
         try:
-            ok, why = await asyncio.wait_for(fut, 15)
-        except asyncio.TimeoutError:
-            ok, why = False, "relay did not confirm (queued, will retry)"
+            pending = set(futs.values())
+            deadline = loop.time() + timeout
+            while pending:
+                done, pending = await asyncio.wait(pending, timeout=max(0, deadline - loop.time()),
+                                                   return_when=asyncio.FIRST_COMPLETED)
+                if not done:
+                    break
+                for u, f in futs.items():
+                    if f in done:
+                        ok, why = f.result()
+                        if ok:
+                            return u, ""
+                        reasons.append(f"{u}: {why or 'rejected'}")
+            reasons += [f"{u}: no confirmation" for u, f in futs.items() if not f.done()]
+            if not futs:
+                reasons.append("not connected")
+            return None, "; ".join(reasons)
         finally:
-            self.pending_ok.pop(ev["id"], None)
-        return ok, why
+            for u in futs:
+                self.pending_ok.pop((u, ev["id"]), None)
+
+    async def publish(self, ev: dict) -> tuple[bool, str]:
+        """Primary relays first; fallback relays per `fallback_mode`.
+        Returns (accepted anywhere, where/why)."""
+        prim, fb, mode = self.cfg.relays, self.cfg.fallback_relays, self.cfg.fallback_mode
+        if mode == "always" and fb:
+            (u1, why1), (u2, why2) = await asyncio.gather(self._send_to(prim, ev), self._send_to(fb, ev))
+            if u1 or u2:
+                return True, "via " + " + ".join(x for x in (u1, u2) if x)
+            return False, f"primary: {why1}; fallback: {why2} (queued, will retry)"
+        u, why = await self._send_to(prim, ev)
+        if u:
+            return True, f"via {u}"
+        if mode == "on-failure" and fb:
+            u2, why2 = await self._send_to(fb, ev)
+            if u2:
+                log.warning("primary relay failed (%s) — sent via fallback %s", why, u2)
+                return True, f"via FALLBACK {u2} (primary: {why})"
+            why = f"primary: {why}; fallback: {why2}"
+        return False, f"{why} (queued, will retry)"
 
     async def flush_outbox(self):
         for r in self.db.execute("SELECT event_id, raw FROM messages WHERE direction='out' AND state='pending'").fetchall():
             ok, why = await self.publish(json.loads(r["raw"]))
             if ok:
                 self.db.execute("UPDATE messages SET state='sent' WHERE event_id=?", (r["event_id"],))
+                log.info("outbox: sent %s %s", r["event_id"][:12], why)
 
     async def event_worker(self):
         """Process incoming events one at a time, in arrival order."""
@@ -519,7 +565,7 @@ class Bridge:
         ok, why = await self.publish(ev)
         self.db.execute("UPDATE messages SET state=? WHERE event_id=?", ("sent" if ok else "pending", ev["id"]))
         return {"ok": True, "topic": topic_id, "msg_id": msg_id, "task_id": task_id,
-                "delivered_to_relay": ok, **({"note": why} if not ok else {})}
+                "delivered_to_relay": ok, ("relay" if ok else "note"): why}
 
     async def open_topic(self, agent: str, peers: list[str], title: str, purpose: str) -> dict:
         ps = [self.cfg.resolve_peer(p) for p in peers]
@@ -544,7 +590,7 @@ class Bridge:
             if not ok:
                 self.db.execute("INSERT INTO messages VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
                                 (ev["id"], tid, None, None, None, "invite", me, "out", title, "[]", "pending", json.dumps(ev), now))
-            results.append({"peer": f'{p.get("name")}@{p.get("owner")}', "invite_sent": ok, **({"note": why} if not ok else {})})
+            results.append({"peer": f'{p.get("name")}@{p.get("owner")}', "invite_sent": ok, ("relay" if ok else "note"): why})
         return {"ok": True, "topic": tid, "title": title, "invites": results}
 
     def close_local(self, topic_id: str):
@@ -576,6 +622,8 @@ class Bridge:
         op = req["op"]
         if op == "status":
             return {"ok": True, "relays": {u: (u in self.conns) for u in self.cfg.relays},
+                    "fallback_relays": {u: (u in self.conns) for u in self.cfg.fallback_relays},
+                    "fallback_mode": self.cfg.fallback_mode,
                     "agents": list(self.cfg.agents)}
         agent = self.pick_agent(req)
         me = self.agent_pks[agent]
@@ -624,10 +672,11 @@ class Bridge:
             self.cfg.sock.unlink()
         server = await asyncio.start_unix_server(self.api, path=str(self.cfg.sock))
         os.chmod(self.cfg.sock, 0o600)
-        log.info("bridge up: agents=%s relays=%s", list(self.cfg.agents), self.cfg.relays)
+        log.info("bridge up: agents=%s relays=%s fallback=%s (%s)", list(self.cfg.agents), self.cfg.relays,
+                 self.cfg.fallback_relays, self.cfg.fallback_mode)
         self.events = asyncio.Queue()
         await asyncio.gather(server.serve_forever(), self.outbox_loop(), self.event_worker(),
-                             *(self.relay_loop(u) for u in self.cfg.relays))
+                             *(self.relay_loop(u) for u in self.cfg.relays + self.cfg.fallback_relays))
 
 
 def _sub(arg: str, subs: dict) -> str:

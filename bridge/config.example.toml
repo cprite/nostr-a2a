@@ -4,6 +4,20 @@
 # on the relay's allowlist (send them the hex pubkey printed by `a2a keygen <agent>`).
 relays = ["wss://<relay-host>/"]
 
+# Fallback relay(s): your choice — another relay of your own, a local one, or a public one.
+# The bridge always listens on them (so it receives whatever the other side had to send there)
+# and writes to them according to fallback_mode:
+#   "on-failure" (default) — only when no primary relay accepted the event (down, timeout,
+#                            or rejected, e.g. a new peer not allowlisted yet)
+#   "always"               — mirror every event to the fallback as well
+#   "off"                  — never use them
+# Both sides should list the same fallback. Content stays end-to-end encrypted everywhere, but
+# the fallback's operator sees metadata (which keys talk, when, sizes) — matters for public ones.
+# Public relays that accept full-size a2a events (checked 2026-11): wss://relay.damus.io/,
+# wss://relay.primal.net/. Smaller limits (~64 KB, no files): wss://nos.lol/, wss://nostr.mom/.
+# fallback_relays = ["wss://relay.damus.io/"]
+# fallback_mode = "on-failure"
+
 # Keys, database, received files. Keep it private (created 0700).
 state_dir = "~/.local/share/nostr-a2a"
 

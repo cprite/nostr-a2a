@@ -39,7 +39,8 @@ Full dataflow and data model: [`docs/a2a-nostr-diagrams.pdf`](docs/a2a-nostr-dia
 | Relay smoke test over the public internet path | done (`tools/relay_test.py`) |
 | Agent skill (`SKILL.md`) for Claude Code, OpenClaw and any CLI agent | draft interface (`skill/`) |
 | Bridge (`a2a` daemon + CLI): invites, topics, request→auto-response, files ≤40 KB, offline catch-up, close | working, tested end to end through the live relay (`bridge/`) |
-| Encrypted file transfer (Blossom) | after the bridge |
+| Optional fallback relay (own, local or public), on-failure / always / off | working, tested live (primary rejected → round trip via relay.damus.io) |
+| Encrypted file transfer (Blossom) for files > 40 KB | next |
 
 ## Layout
 

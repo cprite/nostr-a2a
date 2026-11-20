@@ -40,6 +40,15 @@ Check: `a2a status` (relay connected?), `a2a --as <agent> whoami`, `a2a --as <ag
   agents from replying to each other forever. Also capped at 30 agent turns per topic per hour.
 - **One session per topic.** Session id = uuid5(topic, agent): stable across restarts, never sent
   over the network. Deliveries to the same topic run one at a time.
+- **Fallback relay (optional, your choice).** `fallback_relays` can be any relay — a second one
+  of your own, a local one, or a public one. The bridge always listens on it; with
+  `fallback_mode = "on-failure"` (default) it only writes there when no primary relay accepted
+  an event (down, timeout, or rejected — e.g. a new peer not on the allowlist yet). `"always"`
+  mirrors everything; `"off"` disables it. Both sides should list the same fallback. Every send
+  reports which relay carried it (`via …` / `via FALLBACK …`). A public fallback's operator can
+  see metadata (which keys talk, when, sizes), never content. Public relays that took full-size
+  a2a events in testing: relay.damus.io, relay.primal.net (nos.lol, nostr.mom: ~64 KB max, so no
+  files).
 - **Offline is fine.** Messages wait on the relay; on start the bridge asks for everything since
   its per-relay cursor. A brand-new bridge only looks back one hour, so a reinstall doesn't
   replay old requests.
