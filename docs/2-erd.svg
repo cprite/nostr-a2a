@@ -1,0 +1,199 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1420" height="940" viewBox="0 0 1420 940">
+<defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#333"/></marker>
+<marker id="ahr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#b03030"/></marker>
+</defs>
+<rect x="0" y="0" width="1420" height="940" rx="0" fill="#fff" stroke="none" stroke-width="1.2" />
+<text x="710.0" y="32" font-family="DejaVu Sans" font-size="18" font-weight="bold" text-anchor="middle" fill="#222" >Nostr A2A — entity-relationship (relay vs. bridge)</text>
+<text x="710.0" y="52" font-family="DejaVu Sans" font-size="11" font-weight="normal" text-anchor="middle" fill="#555" >PK = primary key · FK = foreign key · 1 / 0..* = cardinality · dashed = matched by value at runtime, not a stored link</text>
+<rect x="20" y="70" width="390" height="850" rx="8" fill="#fdf1e6" stroke="#d2691e" stroke-width="1.2" stroke-dasharray="5,4"/>
+<text x="36" y="94" font-family="DejaVu Sans" font-size="13" font-weight="bold" text-anchor="start" fill="#d2691e" >RELAY  (Proxmox container · relay.sqlite)</text>
+<text x="36" y="112" font-family="DejaVu Sans" font-size="10.5" font-weight="normal" text-anchor="start" fill="#777" >Generic Nostr software: no agents, no topics, no sessions</text>
+<rect x="430" y="70" width="970" height="850" rx="8" fill="#eef7f0" stroke="#2e8b57" stroke-width="1.2" stroke-dasharray="5,4"/>
+<text x="446" y="94" font-family="DejaVu Sans" font-size="13" font-weight="bold" text-anchor="start" fill="#2e8b57" >BRIDGE  (one copy per machine · bridge.sqlite)</text>
+<text x="446" y="112" font-family="DejaVu Sans" font-size="10.5" font-weight="normal" text-anchor="start" fill="#777" >nikopi5 has one, friend's laptop has its own — never shared, never uploaded</text>
+<rect x="55" y="140" width="320" height="72" rx="5" fill="#fff" stroke="#d2691e" stroke-width="1.6" />
+<path d="M55,168 v-23 a5,5 0 0,1 5,-5 h310 a5,5 0 0,1 5,5 v23 z" fill="#d2691e"/>
+<text x="65" y="159" font-family="DejaVu Sans" font-size="13" font-weight="bold" text-anchor="start" fill="#fff" >ALLOWED_PUBKEY</text>
+<text x="367" y="159" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#fff" >whitelist</text>
+<text x="63" y="182" font-family="DejaVu Sans" font-size="9.5" font-weight="bold" text-anchor="start" fill="#b03030" >PK</text>
+<text x="101" y="182" font-family="DejaVu Sans" font-size="11.5" font-weight="bold" text-anchor="start" fill="#222" >pubkey</text>
+<text x="367" y="182" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >npub allowed to post</text>
+<text x="101" y="201" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >note</text>
+<text x="367" y="201" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >"Scott", "Coder"</text>
+<rect x="55" y="280" width="320" height="148" rx="5" fill="#fff" stroke="#d2691e" stroke-width="1.6" />
+<path d="M55,308 v-23 a5,5 0 0,1 5,-5 h310 a5,5 0 0,1 5,5 v23 z" fill="#d2691e"/>
+<text x="65" y="299" font-family="DejaVu Sans" font-size="13" font-weight="bold" text-anchor="start" fill="#fff" >EVENT</text>
+<text x="63" y="322" font-family="DejaVu Sans" font-size="9.5" font-weight="bold" text-anchor="start" fill="#b03030" >PK</text>
+<text x="101" y="322" font-family="DejaVu Sans" font-size="11.5" font-weight="bold" text-anchor="start" fill="#222" >id</text>
+<text x="367" y="322" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >hash of the event</text>
+<text x="63" y="341" font-family="DejaVu Sans" font-size="9.5" font-weight="bold" text-anchor="start" fill="#7a5a00" >FK</text>
+<text x="101" y="341" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >pubkey</text>
+<text x="367" y="341" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >author npub</text>
+<text x="101" y="360" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >kind</text>
+<text x="367" y="360" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >invite / message / close</text>
+<text x="101" y="379" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >created_at</text>
+<text x="367" y="379" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >unix time</text>
+<text x="101" y="398" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >content</text>
+<text x="367" y="398" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >ENCRYPTED blob</text>
+<text x="101" y="417" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >sig</text>
+<text x="367" y="417" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >author's signature</text>
+<rect x="55" y="540" width="320" height="91" rx="5" fill="#fff" stroke="#d2691e" stroke-width="1.6" />
+<path d="M55,568 v-23 a5,5 0 0,1 5,-5 h310 a5,5 0 0,1 5,5 v23 z" fill="#d2691e"/>
+<text x="65" y="559" font-family="DejaVu Sans" font-size="13" font-weight="bold" text-anchor="start" fill="#fff" >TAG</text>
+<text x="367" y="559" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#fff" >indexed</text>
+<text x="63" y="582" font-family="DejaVu Sans" font-size="9.5" font-weight="bold" text-anchor="start" fill="#7a5a00" >FK</text>
+<text x="101" y="582" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >event_id</text>
+<text x="367" y="582" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >→ EVENT.id</text>
+<text x="101" y="601" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >name</text>
+<text x="367" y="601" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >"p"</text>
+<text x="101" y="620" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >value</text>
+<text x="367" y="620" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >npub or topic pubkey</text>
+<path d="M215,212 L215,280" fill="none" stroke="#333" stroke-width="1.4" />
+<text x="221" y="226" font-family="DejaVu Sans" font-size="11" font-weight="bold" text-anchor="start" fill="#b03030" >1</text>
+<text x="221" y="274" font-family="DejaVu Sans" font-size="11" font-weight="bold" text-anchor="start" fill="#b03030" >0..*</text>
+<path d="M215,428 L215,540" fill="none" stroke="#333" stroke-width="1.4" />
+<text x="221" y="442" font-family="DejaVu Sans" font-size="11" font-weight="bold" text-anchor="start" fill="#b03030" >1</text>
+<text x="221" y="534" font-family="DejaVu Sans" font-size="11" font-weight="bold" text-anchor="start" fill="#b03030" >0..*</text>
+<rect x="460" y="140" width="280" height="110" rx="5" fill="#fff" stroke="#2e8b57" stroke-width="1.6" />
+<path d="M460,168 v-23 a5,5 0 0,1 5,-5 h270 a5,5 0 0,1 5,5 v23 z" fill="#2e8b57"/>
+<text x="470" y="159" font-family="DejaVu Sans" font-size="13" font-weight="bold" text-anchor="start" fill="#fff" >IDENTITY</text>
+<text x="732" y="159" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#fff" >local agent</text>
+<text x="468" y="182" font-family="DejaVu Sans" font-size="9.5" font-weight="bold" text-anchor="start" fill="#b03030" >PK</text>
+<text x="506" y="182" font-family="DejaVu Sans" font-size="11.5" font-weight="bold" text-anchor="start" fill="#222" >agent_id</text>
+<text x="732" y="182" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >"hack-lead"</text>
+<text x="506" y="201" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >npub</text>
+<text x="732" y="201" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >public key</text>
+<text x="506" y="220" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >nsec</text>
+<text x="732" y="220" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >SECRET key</text>
+<text x="506" y="239" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >deliver_cmd</text>
+<text x="732" y="239" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >"openclaw agent …"</text>
+<rect x="1130" y="140" width="250" height="110" rx="5" fill="#fff" stroke="#2e8b57" stroke-width="1.6" />
+<path d="M1130,168 v-23 a5,5 0 0,1 5,-5 h240 a5,5 0 0,1 5,5 v23 z" fill="#2e8b57"/>
+<text x="1140" y="159" font-family="DejaVu Sans" font-size="13" font-weight="bold" text-anchor="start" fill="#fff" >PEER</text>
+<text x="1372" y="159" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#fff" >remote agent</text>
+<text x="1138" y="182" font-family="DejaVu Sans" font-size="9.5" font-weight="bold" text-anchor="start" fill="#b03030" >PK</text>
+<text x="1176" y="182" font-family="DejaVu Sans" font-size="11.5" font-weight="bold" text-anchor="start" fill="#222" >npub</text>
+<text x="1372" y="182" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >remote agent key</text>
+<text x="1176" y="201" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >label</text>
+<text x="1372" y="201" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >"Coder@friend"</text>
+<text x="1176" y="220" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >owner</text>
+<text x="1372" y="220" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >"friend"</text>
+<text x="1176" y="239" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >trusted</text>
+<text x="1372" y="239" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >bool</text>
+<rect x="460" y="390" width="280" height="110" rx="5" fill="#fff" stroke="#2e8b57" stroke-width="1.6" />
+<path d="M460,418 v-23 a5,5 0 0,1 5,-5 h270 a5,5 0 0,1 5,5 v23 z" fill="#2e8b57"/>
+<text x="470" y="409" font-family="DejaVu Sans" font-size="13" font-weight="bold" text-anchor="start" fill="#fff" >ROUTE</text>
+<text x="732" y="409" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#fff" >topic → session</text>
+<text x="468" y="432" font-family="DejaVu Sans" font-size="9.5" font-weight="bold" text-anchor="start" fill="#b03030" >PK FK</text>
+<text x="506" y="432" font-family="DejaVu Sans" font-size="11.5" font-weight="bold" text-anchor="start" fill="#222" >topic_id</text>
+<text x="732" y="432" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >→ TOPIC</text>
+<text x="468" y="451" font-family="DejaVu Sans" font-size="9.5" font-weight="bold" text-anchor="start" fill="#b03030" >PK FK</text>
+<text x="506" y="451" font-family="DejaVu Sans" font-size="11.5" font-weight="bold" text-anchor="start" fill="#222" >agent_id</text>
+<text x="732" y="451" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >→ IDENTITY</text>
+<text x="506" y="470" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >local_session_id</text>
+<text x="732" y="470" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >"S1"</text>
+<text x="506" y="489" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >created_at</text>
+<rect x="820" y="360" width="270" height="186" rx="5" fill="#fff" stroke="#2e8b57" stroke-width="1.6" />
+<path d="M820,388 v-23 a5,5 0 0,1 5,-5 h260 a5,5 0 0,1 5,5 v23 z" fill="#2e8b57"/>
+<text x="830" y="379" font-family="DejaVu Sans" font-size="13" font-weight="bold" text-anchor="start" fill="#fff" >TOPIC</text>
+<text x="828" y="402" font-family="DejaVu Sans" font-size="9.5" font-weight="bold" text-anchor="start" fill="#b03030" >PK</text>
+<text x="866" y="402" font-family="DejaVu Sans" font-size="11.5" font-weight="bold" text-anchor="start" fill="#222" >topic_id</text>
+<text x="1082" y="402" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >"zalu-api-7f3c"</text>
+<text x="866" y="421" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >topic_pubkey</text>
+<text x="1082" y="421" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >address on relay</text>
+<text x="866" y="440" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >topic_secret</text>
+<text x="1082" y="440" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >shared w/ members</text>
+<text x="866" y="459" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >title</text>
+<text x="1082" y="459" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >"ZALU API"</text>
+<text x="866" y="478" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >created_by</text>
+<text x="1082" y="478" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >npub</text>
+<text x="866" y="497" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >status</text>
+<text x="1082" y="497" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >invited/active/closed</text>
+<text x="866" y="516" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >created_at</text>
+<text x="866" y="535" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >closed_at</text>
+<rect x="1130" y="390" width="250" height="110" rx="5" fill="#fff" stroke="#2e8b57" stroke-width="1.6" />
+<path d="M1130,418 v-23 a5,5 0 0,1 5,-5 h240 a5,5 0 0,1 5,5 v23 z" fill="#2e8b57"/>
+<text x="1140" y="409" font-family="DejaVu Sans" font-size="13" font-weight="bold" text-anchor="start" fill="#fff" >MEMBER</text>
+<text x="1138" y="432" font-family="DejaVu Sans" font-size="9.5" font-weight="bold" text-anchor="start" fill="#b03030" >PK FK</text>
+<text x="1176" y="432" font-family="DejaVu Sans" font-size="11.5" font-weight="bold" text-anchor="start" fill="#222" >topic_id</text>
+<text x="1372" y="432" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >→ TOPIC</text>
+<text x="1138" y="451" font-family="DejaVu Sans" font-size="9.5" font-weight="bold" text-anchor="start" fill="#b03030" >PK FK</text>
+<text x="1176" y="451" font-family="DejaVu Sans" font-size="11.5" font-weight="bold" text-anchor="start" fill="#222" >npub</text>
+<text x="1372" y="451" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >→ PEER or IDENTITY</text>
+<text x="1176" y="470" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >role</text>
+<text x="1372" y="470" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >owner / member</text>
+<text x="1176" y="489" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >joined_at</text>
+<rect x="460" y="640" width="280" height="72" rx="5" fill="#fff" stroke="#2e8b57" stroke-width="1.6" />
+<path d="M460,668 v-23 a5,5 0 0,1 5,-5 h270 a5,5 0 0,1 5,5 v23 z" fill="#2e8b57"/>
+<text x="470" y="659" font-family="DejaVu Sans" font-size="13" font-weight="bold" text-anchor="start" fill="#fff" >CURSOR</text>
+<text x="732" y="659" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#fff" >per relay</text>
+<text x="468" y="682" font-family="DejaVu Sans" font-size="9.5" font-weight="bold" text-anchor="start" fill="#b03030" >PK</text>
+<text x="506" y="682" font-family="DejaVu Sans" font-size="11.5" font-weight="bold" text-anchor="start" fill="#222" >relay_url</text>
+<text x="732" y="682" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >wss://…</text>
+<text x="506" y="701" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >last_seen_at</text>
+<text x="732" y="701" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >catch-up point</text>
+<rect x="820" y="610" width="270" height="243" rx="5" fill="#fff" stroke="#2e8b57" stroke-width="1.6" />
+<path d="M820,638 v-23 a5,5 0 0,1 5,-5 h260 a5,5 0 0,1 5,5 v23 z" fill="#2e8b57"/>
+<text x="830" y="629" font-family="DejaVu Sans" font-size="13" font-weight="bold" text-anchor="start" fill="#fff" >MESSAGE</text>
+<text x="828" y="652" font-family="DejaVu Sans" font-size="9.5" font-weight="bold" text-anchor="start" fill="#b03030" >PK</text>
+<text x="866" y="652" font-family="DejaVu Sans" font-size="11.5" font-weight="bold" text-anchor="start" fill="#222" >event_id</text>
+<text x="1082" y="652" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >= EVENT.id</text>
+<text x="828" y="671" font-family="DejaVu Sans" font-size="9.5" font-weight="bold" text-anchor="start" fill="#7a5a00" >FK</text>
+<text x="866" y="671" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >topic_id</text>
+<text x="1082" y="671" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >→ TOPIC</text>
+<text x="866" y="690" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >msg_id</text>
+<text x="866" y="709" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >task_id</text>
+<text x="1082" y="709" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >request + its answers</text>
+<text x="828" y="728" font-family="DejaVu Sans" font-size="9.5" font-weight="bold" text-anchor="start" fill="#7a5a00" >FK</text>
+<text x="866" y="728" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >reply_to</text>
+<text x="1082" y="728" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >→ MESSAGE.msg_id</text>
+<text x="866" y="747" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >type</text>
+<text x="1082" y="747" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >request/response/status/ack</text>
+<text x="866" y="766" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >from_npub</text>
+<text x="866" y="785" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >direction</text>
+<text x="1082" y="785" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >in / out</text>
+<text x="866" y="804" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >body</text>
+<text x="1082" y="804" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >DECRYPTED text</text>
+<text x="866" y="823" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >state</text>
+<text x="1082" y="823" font-family="DejaVu Sans" font-size="10" font-weight="normal" text-anchor="end" fill="#777" >pending/sent/delivered/failed</text>
+<text x="866" y="842" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >created_at</text>
+<path d="M600,250 L600,390" fill="none" stroke="#333" stroke-width="1.4" />
+<text x="606" y="264" font-family="DejaVu Sans" font-size="11" font-weight="bold" text-anchor="start" fill="#b03030" >1</text>
+<text x="606" y="384" font-family="DejaVu Sans" font-size="11" font-weight="bold" text-anchor="start" fill="#b03030" >0..*</text>
+<path d="M740,428.5 L820,428.5" fill="none" stroke="#333" stroke-width="1.4" />
+<text x="748" y="422.5" font-family="DejaVu Sans" font-size="11" font-weight="bold" text-anchor="start" fill="#b03030" >0..*</text>
+<text x="812" y="443.5" font-family="DejaVu Sans" font-size="11" font-weight="bold" text-anchor="end" fill="#b03030" >1</text>
+<path d="M1090,428.5 L1130,428.5" fill="none" stroke="#333" stroke-width="1.4" />
+<text x="1098" y="422.5" font-family="DejaVu Sans" font-size="11" font-weight="bold" text-anchor="start" fill="#b03030" >1</text>
+<text x="1122" y="443.5" font-family="DejaVu Sans" font-size="11" font-weight="bold" text-anchor="end" fill="#b03030" >0..*</text>
+<path d="M1255,250 L1255,390" fill="none" stroke="#333" stroke-width="1.4" />
+<text x="1261" y="264" font-family="DejaVu Sans" font-size="11" font-weight="bold" text-anchor="start" fill="#b03030" >1</text>
+<text x="1261" y="384" font-family="DejaVu Sans" font-size="11" font-weight="bold" text-anchor="start" fill="#b03030" >0..*</text>
+<path d="M740,197.5 L1112,197.5 L1112,447.5 L1130,447.5" fill="none" stroke="#555" stroke-width="1.4" stroke-dasharray="6,4"/>
+<text x="748" y="191.5" font-family="DejaVu Sans" font-size="11" font-weight="bold" text-anchor="start" fill="#b03030" >1</text>
+<text x="1122" y="462.5" font-family="DejaVu Sans" font-size="11" font-weight="bold" text-anchor="end" fill="#b03030" >0..*</text>
+<text x="930" y="191.5" font-family="DejaVu Sans" font-size="10.5" font-weight="normal" text-anchor="middle" fill="#555" font-style="italic">or (own agent)</text>
+<path d="M955,546 L955,610" fill="none" stroke="#333" stroke-width="1.4" />
+<text x="961" y="560" font-family="DejaVu Sans" font-size="11" font-weight="bold" text-anchor="start" fill="#b03030" >1</text>
+<text x="961" y="604" font-family="DejaVu Sans" font-size="11" font-weight="bold" text-anchor="start" fill="#b03030" >0..*</text>
+<path d="M1090,724.5 L1112,724.5 L1112,686.5 L1090,686.5" fill="none" stroke="#333" stroke-width="1.4" />
+<text x="1098" y="718.5" font-family="DejaVu Sans" font-size="11" font-weight="bold" text-anchor="start" fill="#b03030" >0..*</text>
+<text x="1098" y="701.5" font-family="DejaVu Sans" font-size="11" font-weight="bold" text-anchor="start" fill="#b03030" >1</text>
+<text x="1150" y="709.5" font-family="DejaVu Sans" font-size="10.5" font-weight="normal" text-anchor="middle" fill="#333" font-style="italic">reply_to</text>
+<path d="M375,616.5 L780,616.5 L780,417.5 L820,417.5" fill="none" stroke="#b03030" stroke-width="1.4" stroke-dasharray="6,4"/>
+<text x="560" y="594.5" font-family="DejaVu Sans" font-size="10.5" font-weight="normal" text-anchor="middle" fill="#b03030" font-style="italic">TAG.value = TOPIC.topic_pubkey</text>
+<text x="560" y="608.5" font-family="DejaVu Sans" font-size="10.5" font-weight="normal" text-anchor="middle" fill="#b03030" font-style="italic">(bridge filters #p on its topics)</text>
+<path d="M375,394.5 L420,394.5 L420,860 L800,860 L800,800.5 L820,800.5" fill="none" stroke="#b03030" stroke-width="1.4" stroke-dasharray="6,4"/>
+<text x="600" y="854" font-family="DejaVu Sans" font-size="10.5" font-weight="normal" text-anchor="middle" fill="#b03030" font-style="italic">EVENT.content  —decrypt→  MESSAGE.body</text>
+<rect x="45" y="700" width="345" height="128" rx="6" fill="#fff" stroke="#999" stroke-width="1.2" />
+<text x="58" y="722" font-family="DejaVu Sans" font-size="12" font-weight="bold" text-anchor="start" fill="#222" >How an incoming event finds its session</text>
+<text x="58" y="742" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >1. EVENT arrives, TAG p = topic_pubkey</text>
+<text x="58" y="759" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >2. → TOPIC with that topic_pubkey (decrypt)</text>
+<text x="58" y="776" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >3. → ROUTE for that topic_id</text>
+<text x="58" y="793" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >4. → agent_id + local_session_id</text>
+<text x="58" y="810" font-family="DejaVu Sans" font-size="11.5" font-weight="normal" text-anchor="start" fill="#222" >5. run IDENTITY.deliver_cmd for that session</text>
+<text x="710.0" y="910" font-family="DejaVu Sans" font-size="12" font-weight="bold" text-anchor="middle" fill="#2b3a55" >Sessions exist ONLY in ROUTE on each machine. The relay stores EVENT + TAG and nothing else.</text>
+</svg>

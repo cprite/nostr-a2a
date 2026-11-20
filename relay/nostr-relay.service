@@ -1,0 +1,21 @@
+[Unit]
+Description=Nostr relay (private A2A)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=nostr
+Group=nostr
+ExecStart=/opt/nostr-relay/nostr-rs-relay --config /etc/nostr-relay/config.toml --db /var/lib/nostr-relay
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+ProtectHome=yes
+ReadWritePaths=/var/lib/nostr-relay
+CapabilityBoundingSet=
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryMax=300M
+
+[Install]
+WantedBy=multi-user.target

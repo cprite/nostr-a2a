@@ -1,0 +1,4 @@
+nostr-rs-relay  https://github.com/scsibug/nostr-rs-relay
+version         0.10.0
+commit          b5c1f64 (2026-05-22)
+toolchain       rust 1.95.0  (1.85 too old for deps; 1.100 breaks sqlx-core 0.6.3)

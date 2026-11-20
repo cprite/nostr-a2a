@@ -1,0 +1,11 @@
+[Unit]
+Description=nftables isolation for the nostr relay bridge vmbr9
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/nft -f /etc/relay-isolation.nft
+ExecStop=/usr/sbin/nft delete table inet relayiso
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,24 @@
+// Tailnet policy: your own devices unrestricted; the relay (tag:relay) gets NO outbound tailnet access.
+// Merge into your existing policy (Admin console -> Access controls -> JSON editor).
+// Before applying: run `tailscale status --json` and check that none of YOUR devices carry tags —
+// autogroup:member excludes tagged devices, so they would lose access.
+{
+	"tagOwners": {
+		"tag:relay": ["autogroup:admin"],
+	},
+
+	"nodeAttrs": [
+		{ "target": ["autogroup:member"], "attr": ["funnel"] },  // keep Funnel for your own devices
+		{ "target": ["tag:relay"],        "attr": ["funnel"] },  // relay serves the public wss://
+	],
+
+	"grants": [
+		// Own untagged devices reach everything; tagged devices (the relay) get nothing.
+		{ "src": ["autogroup:member"], "dst": ["*"], "ip": ["*"] },
+	],
+
+	// Refuse any future policy edit that would let the relay reach you.
+	"tests": [
+		{ "src": "tag:relay", "deny": ["<you@example.com>:22", "<you@example.com>:443"] },
+	],
+}

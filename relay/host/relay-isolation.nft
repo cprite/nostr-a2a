@@ -1,0 +1,31 @@
+#!/usr/sbin/nft -f
+# Isolation for the nostr relay segment vmbr9 (10.99.9.0/24, CT106).
+# Scoped to vmbr9 only: other bridges/guests are not matched by any rule here.
+table inet relayiso {}
+delete table inet relayiso
+table inet relayiso {
+  set private4 {
+    type ipv4_addr; flags interval
+    elements = { 0.0.0.0/8, 10.0.0.0/8, 100.64.0.0/10, 127.0.0.0/8, 169.254.0.0/16,
+                 172.16.0.0/12, 192.0.0.0/24, 192.168.0.0/16, 198.18.0.0/15,
+                 224.0.0.0/4, 240.0.0.0/4 }
+  }
+  chain input {
+    type filter hook input priority -10; policy accept;
+    iifname "vmbr9" ct state established,related accept
+    iifname "vmbr9" counter drop comment "relay may not talk to the Proxmox host"
+  }
+  chain forward {
+    type filter hook forward priority -10; policy accept;
+    oifname "vmbr9" ct state established,related accept
+    oifname "vmbr9" counter drop comment "nothing may open connections to the relay"
+    iifname "vmbr9" meta nfproto ipv6 counter drop comment "no IPv6 out of the segment"
+    iifname "vmbr9" ip daddr @private4 counter drop comment "no LAN, no other guests, no tailnet IPs"
+    iifname "vmbr9" oifname "vmbr0" accept comment "internet only"
+    iifname "vmbr9" counter drop
+  }
+  chain postrouting {
+    type nat hook postrouting priority 100; policy accept;
+    ip saddr 10.99.9.0/24 oifname "vmbr0" masquerade
+  }
+}

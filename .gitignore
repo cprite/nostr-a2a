@@ -1,0 +1,12 @@
+# upstream relay source is pinned in relay/UPSTREAM, not vendored
+relay-src/
+.venv/
+__pycache__/
+*.pyc
+# shelved Pi Zero e-paper experiment (vendor driver code)
+epaper/
+# never commit keys
+*.nsec
+*.key
+keys/
+.env

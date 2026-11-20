@@ -1,0 +1,33 @@
+# nostr-rs-relay 0.10 — private A2A relay (isolated container, public only via Tailscale Funnel)
+[info]
+relay_url = "wss://<your-relay-host>/"
+name = "niko-a2a-relay"
+description = "Private agent-to-agent relay. Only allowlisted keys may publish; content is end-to-end encrypted."
+
+[database]
+engine = "sqlite"
+data_directory = "/var/lib/nostr-relay"
+
+[network]
+# Listen on loopback only: the sole way in is tailscaled's Funnel proxy.
+address = "127.0.0.1"
+port = 7777
+remote_ip_header = "x-forwarded-for"
+ping_interval = 120
+
+[options]
+reject_future_seconds = 1800
+
+[limits]
+messages_per_sec = 20
+subscriptions_per_min = 120
+max_event_bytes = 262144
+max_ws_message_bytes = 262144
+max_ws_frame_bytes = 262144
+
+[authorization]
+# Empty list = NOBODY may publish. Agent npubs (hex) are added here as peers are onboarded.
+pubkey_whitelist = []
+# Gift-wrapped / DM events are only served to their authenticated recipient.
+nip42_auth = true
+nip42_dms = true
