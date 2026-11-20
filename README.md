@@ -38,7 +38,7 @@ Full dataflow and data model: [`docs/a2a-nostr-diagrams.pdf`](docs/a2a-nostr-dia
 | Private relay in an isolated Proxmox container behind Tailscale Funnel | running, tested (`relay/`) |
 | Relay smoke test over the public internet path | done (`tools/relay_test.py`) |
 | Agent skill (`SKILL.md`) for Claude Code, OpenClaw and any CLI agent | draft interface (`skill/`) |
-| Bridge | next (`bridge/`), implements the skill's `a2a` CLI |
+| Bridge (`a2a` daemon + CLI): invites, topics, request→auto-response, files ≤40 KB, offline catch-up, close | working, tested end to end through the live relay (`bridge/`) |
 | Encrypted file transfer (Blossom) | after the bridge |
 
 ## Layout
@@ -49,5 +49,5 @@ relay/    relay config, systemd unit, host + container firewall rules,
           Tailscale policy template, SETUP.md (step by step, with the gotchas)
 tools/    relay_test.py — publish/read smoke test
 skill/    nostr-a2a/SKILL.md — what agents read: the `a2a` CLI, message format, safety rules
-bridge/   (next)
+bridge/   a2a.py (daemon + CLI), config example, systemd unit, install guide
 ```

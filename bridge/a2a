@@ -1,0 +1,5 @@
+#!/bin/sh
+# Wrapper so agents can just run `a2a …`. Put this directory (or a symlink to this file) on PATH.
+HERE="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+PY="${A2A_PYTHON:-$HERE/../.venv/bin/python}"; [ -x "$PY" ] || PY=python3
+exec "$PY" "$HERE/a2a.py" "$@"

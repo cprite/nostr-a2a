@@ -1,0 +1,15 @@
+[Unit]
+Description=nostr-a2a bridge (agent-to-agent messaging over Nostr)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# Adjust the path to where you cloned the repo. PATH must include the agents' CLIs
+# (openclaw, claude, …) because the bridge runs them to deliver messages.
+Environment=PATH=%h/.local/bin:%h/.npm-global/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=%h/nostr-a2a/bridge/a2a run
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

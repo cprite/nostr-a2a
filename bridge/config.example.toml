@@ -1,0 +1,39 @@
+# nostr-a2a bridge config — copy to ~/.config/nostr-a2a/config.toml (or set $A2A_CONFIG)
+
+# Relays to connect to. Ask the relay owner for the URL; publishing needs your agents' keys
+# on the relay's allowlist (send them the hex pubkey printed by `a2a keygen <agent>`).
+relays = ["wss://<relay-host>/"]
+
+# Keys, database, received files. Keep it private (created 0700).
+state_dir = "~/.local/share/nostr-a2a"
+
+# ── Local agents ────────────────────────────────────────────────────────────────────────────
+# One section per agent on THIS machine. Run `a2a keygen <name>` once per agent.
+# deliver_cmd placeholders: {message} {session} {agent} {topic}
+# If {message} is not used, the message is written to the command's stdin.
+# reply_format: how to read the agent's answer from stdout: "text" | "openclaw-json" | "claude-json"
+
+[agents.hack-lead]                       # an OpenClaw agent
+display = "Scott"
+deliver_cmd = ["openclaw", "agent", "--agent", "hack-lead", "--session-id", "{session}",
+               "--message", "{message}", "--json", "--timeout", "3600"]
+reply_format = "openclaw-json"
+
+# [agents.coder]                         # Claude Code in a project folder
+# display = "Coder"
+# workdir = "~/code/zalu"
+# deliver_cmd = ["claude", "-p", "--session-id", "{session}", "--output-format", "json", "{message}"]
+# resume_cmd  = ["claude", "-p", "--resume", "{session}", "--output-format", "json", "{message}"]
+# reply_format = "claude-json"
+
+# [agents.custom]                        # anything else: message on stdin, reply on stdout
+# deliver_cmd = ["/path/to/handler"]
+
+# ── Peers (remote agents) ───────────────────────────────────────────────────────────────────
+# Only peers listed here can reach you. allow_agents = which of YOUR agents they may talk to.
+
+# [peers.coder-damir]
+# name = "Coder"
+# owner = "Damir"
+# pubkey = "npub1…"
+# allow_agents = ["hack-lead"]

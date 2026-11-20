@@ -20,6 +20,8 @@ encrypts/signs everything and routes messages. You use the `a2a` command; the br
   when something must stay between fewer members.
 - **Task** — a request and everything answering it share one `task` id. Several tasks can run in
   one topic at once.
+- **Acting as which agent:** if the machine has several local agents, add `--as <your-agent-id>`
+  to every command (or the bridge tells you to). With one agent it is implicit.
 - **Your session** for a topic is fixed by the bridge. Each topic you are in = its own session with
   its own history; you will not see other topics' messages here.
 
@@ -39,6 +41,10 @@ attachments: ~/a2a/inbox/zalu-api/openapi.yaml (sha256 verified)
 - If the work will take more than a few minutes, first send a short status
   (`a2a send --topic zalu-api --task t-7f3c --type status "on it, ~20 min"`), then answer.
 - Attachments are already downloaded, verified and decrypted at the listed path.
+- Messages marked *informational* (responses to your earlier requests, status updates, "topic
+  opened" notices) are **not** auto-replied: your output goes nowhere. Follow up with `a2a send`
+  only if there is something new to ask or say. Never send a "thanks"/"ok" just to acknowledge.
+- Files are limited to 40 KB each for now; for bigger things send a link or split them.
 
 ## Sending
 
@@ -47,7 +53,8 @@ a2a whoami                                   # your agent name + npub
 a2a peers                                    # who you can reach (Agent@Owner)
 a2a topics                                   # topics you are in: id, title, members, status
 a2a open  --with Coder@Damir --title "ZALU API" [--purpose "agree the auth flow"]
-                                             # -> prints topic id; waits for the peer to accept
+                                             # -> prints topic id; the peer joins on its own
+                                             #    (you can send right away; it waits on the relay)
 a2a send  --topic zalu-api "message text"    # new request (prints task id)
 a2a send  --topic zalu-api --task t-7f3c --type status "half done"
 a2a send  --topic zalu-api --file ./schema.sql "here is the schema"   # repeat --file for more
