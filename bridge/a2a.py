@@ -12,7 +12,7 @@ Wire format (all events signed by the sending agent's key, content NIP-44 v2 enc
 from __future__ import annotations
 
 import argparse, asyncio, base64, contextlib, hashlib, hmac, json, logging, os, re, secrets
-import shlex, sqlite3, ssl, sys, time, tomllib, uuid
+import shlex, shutil, sqlite3, ssl, sys, time, tomllib, uuid
 from pathlib import Path
 
 KIND_INVITE, KIND_TOPIC = 4100, 4101
@@ -20,6 +20,7 @@ PROTO = 1
 MAX_INLINE_FILE = 40_000          # bytes per message (NIP-44 caps plaintext at 64 KiB)
 DELIVERY_TIMEOUT = 3700
 MAX_DELIVERIES_PER_HOUR = 30      # per topic, loop/runaway protection
+WINDOWS = sys.platform == "win32"   # no unix sockets in asyncio there: localhost TCP + token
 SESSION_NS = uuid.UUID("6f1c4c1e-8a7b-4f0e-9d55-a2a0b51d9e01")
 log = logging.getLogger("a2a")
 
@@ -202,6 +203,10 @@ class Config:
             self.peers[pid] = p
         self.state.mkdir(parents=True, exist_ok=True, mode=0o700)
         (self.state / "keys").mkdir(exist_ok=True, mode=0o700)
+
+    @property
+    def port_file(self) -> Path:   # Windows: {"port", "token"} of the local API
+        return self.state / "bridge.port"
 
     @property
     def sock(self) -> Path:
@@ -544,6 +549,12 @@ class Bridge:
             tmpl = ac.get("resume_cmd") if route["started"] and ac.get("resume_cmd") else ac["deliver_cmd"]
             subs = {"{session}": route["session_id"], "{message}": text, "{agent}": agent, "{topic}": topic_id}
             argv = [subs.get(a, a) if a in subs else _sub(a, subs) for a in tmpl]
+            argv[0] = shutil.which(argv[0]) or argv[0]   # Windows: finds claude.cmd / .exe via PATHEXT
+            if WINDOWS and argv[0].lower().endswith((".cmd", ".bat")) and any("{message}" in a for a in tmpl):
+                # cmd.exe re-parses arguments: a remote message with & | ^ " could run commands.
+                log.error("%s: deliver_cmd runs a .cmd/.bat with {message} in argv; drop {message} "
+                          "so the message goes on stdin", agent)
+                return
             stdin_msg = "{message}" not in " ".join(tmpl)
             env = {**os.environ, "A2A_AGENT": agent, "A2A_TOPIC": topic_id, "A2A_SESSION": route["session_id"]}
             log.info("delivering %s in %s to %s", m.get("type"), topic_id, agent)
@@ -624,6 +635,8 @@ class Bridge:
     async def api(self, reader, writer):
         try:
             req = json.loads(await reader.readline())
+            if WINDOWS and not hmac.compare_digest(str(req.pop("token", "")), self.api_token):
+                raise PermissionError("bad local API token")
             res = await self.handle(req)
         except Exception as e:
             res = {"ok": False, "error": f"{type(e).__name__}: {e}"}
@@ -691,10 +704,16 @@ class Bridge:
         raise ValueError(f"unknown op {op}")
 
     async def run(self):
-        if self.cfg.sock.exists():
-            self.cfg.sock.unlink()
-        server = await asyncio.start_unix_server(self.api, path=str(self.cfg.sock))
-        os.chmod(self.cfg.sock, 0o600)
+        if WINDOWS:
+            server = await asyncio.start_server(self.api, "127.0.0.1", 0)
+            self.api_token = secrets.token_hex(16)
+            port = server.sockets[0].getsockname()[1]
+            self.cfg.port_file.write_text(json.dumps({"port": port, "token": self.api_token}))
+        else:
+            if self.cfg.sock.exists():
+                self.cfg.sock.unlink()
+            server = await asyncio.start_unix_server(self.api, path=str(self.cfg.sock))
+            os.chmod(self.cfg.sock, 0o600)
         log.info("bridge up: agents=%s relays=%s fallback=%s (%s)", list(self.cfg.agents), self.cfg.relays,
                  self.cfg.fallback_relays, self.cfg.fallback_mode)
         self.events = asyncio.Queue()
@@ -725,7 +744,12 @@ def parse_reply(out: str, fmt: str) -> str:
 
 async def call(cfg: Config, req: dict) -> dict:
     try:
-        r, w = await asyncio.open_unix_connection(str(cfg.sock))
+        if WINDOWS:
+            pf = json.loads(cfg.port_file.read_text())
+            req = {**req, "token": pf["token"]}
+            r, w = await asyncio.open_connection("127.0.0.1", pf["port"])
+        else:
+            r, w = await asyncio.open_unix_connection(str(cfg.sock))
     except (FileNotFoundError, ConnectionRefusedError):
         return {"ok": False, "error": "bridge is not running (start it with `a2a run`)"}
     w.write((json.dumps(req) + "\n").encode())

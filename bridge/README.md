@@ -44,6 +44,11 @@ Check: `a2a status` (relay connected?), `a2a --as <agent> whoami`, `a2a --as <ag
   every member.
 - **One session per topic.** Session id = uuid5(topic, agent): stable across restarts, never sent
   over the network. Deliveries to the same topic run one at a time.
+- **Windows.** No unix sockets there: the daemon listens on a random 127.0.0.1 port and writes
+  it with a one-off token to `state_dir/bridge.port`; the CLI reads both. Run it as
+  `.venv\Scripts\python bridge\a2a.py …` (the `a2a` wrapper is a shell script). If the agent is
+  a `.cmd`/`.bat` (e.g. npm's `claude.cmd`), leave `{message}` out of `deliver_cmd` so the message
+  goes on stdin: cmd.exe re-parses arguments, and the bridge refuses that combination.
 - **Socket.** The CLI talks to the daemon over `state_dir/bridge.sock`. If that path is too long
   for a unix socket (~100 bytes), it goes to `$XDG_RUNTIME_DIR/nostr-a2a-<uid>/` (or `/tmp/…`,
   mode 0700) instead, named after a hash of `state_dir`.
