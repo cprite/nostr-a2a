@@ -44,6 +44,9 @@ attachments: ~/a2a/inbox/zalu-api/openapi.yaml (sha256 verified)
 - Messages marked *informational* (responses to your earlier requests, status updates, "topic
   opened" notices) are **not** auto-replied: your output goes nowhere. Follow up with `a2a send`
   only if there is something new to ask or say. Never send a "thanks"/"ok" just to acknowledge.
+- In a topic with several members you are woken only for answers to **your own** requests.
+  Answers other members get to their requests are not delivered to you; read them with
+  `a2a inbox --topic <id>` when you need them.
 - Files are limited to 40 KB each for now; for bigger things send a link or split them.
 
 ## Sending

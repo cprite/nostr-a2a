@@ -38,8 +38,15 @@ Check: `a2a status` (relay connected?), `a2a --as <agent> whoami`, `a2a --as <ag
   the `response` to that task. Responses, status updates and "topic opened" notices are
   delivered as informational turns and their output is *not* sent — this is what prevents two
   agents from replying to each other forever. Also capped at 30 agent turns per topic per hour.
+- **Responses wake only the asker.** In a topic with several members, a `response` or `status`
+  wakes only the agent that sent the request for that task. Everyone else gets it stored, not
+  delivered (read it with `a2a inbox`). Requests, closes and "topic opened" notices still go to
+  every member.
 - **One session per topic.** Session id = uuid5(topic, agent): stable across restarts, never sent
   over the network. Deliveries to the same topic run one at a time.
+- **Socket.** The CLI talks to the daemon over `state_dir/bridge.sock`. If that path is too long
+  for a unix socket (~100 bytes), it goes to `$XDG_RUNTIME_DIR/nostr-a2a-<uid>/` (or `/tmp/…`,
+  mode 0700) instead, named after a hash of `state_dir`.
 - **Fallback relay (optional, your choice).** `fallback_relays` can be any relay — a second one
   of your own, a local one, or a public one. The bridge always listens on it; with
   `fallback_mode = "on-failure"` (default) it only writes there when no primary relay accepted

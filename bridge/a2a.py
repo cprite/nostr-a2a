@@ -205,7 +205,18 @@ class Config:
 
     @property
     def sock(self) -> Path:
-        return self.state / "bridge.sock"
+        p = self.state / "bridge.sock"
+        if len(os.fsencode(p)) <= 100:   # AF_UNIX paths are capped at ~104-108 bytes
+            return p
+        # Long state_dir: put the socket in a private per-user dir, named after the state dir so
+        # several bridges on one machine never collide.
+        base = Path(os.environ.get("XDG_RUNTIME_DIR") or "/tmp")
+        d = base / f"nostr-a2a-{os.getuid()}"
+        d.mkdir(mode=0o700, exist_ok=True)
+        st = d.lstat()
+        if st.st_uid != os.getuid() or st.st_mode & 0o077 or not d.is_dir() or d.is_symlink():
+            raise RuntimeError(f"refusing unsafe socket dir {d}; set a shorter state_dir")
+        return d / f"{hashlib.sha256(os.fsencode(self.state)).hexdigest()[:16]}.sock"
 
     def key(self, agent: str) -> str:
         return (self.state / "keys" / f"{agent}.key").read_text().strip()
@@ -470,6 +481,10 @@ class Bridge:
         if typ == "accept":
             return  # visible in `a2a topics`; not worth an agent turn
         for r in self.db.execute("SELECT agent FROM routes WHERE topic_id=?", (t["topic_id"],)).fetchall():
+            if typ in ("response", "status") and not self.asked(r["agent"], t["topic_id"], m.get("task_id")):
+                # Someone else's task: stored, readable with `a2a inbox`, but not worth waking this
+                # agent for (in a 4-member topic that tripled the turns per request).
+                continue
             await self.deliver(r["agent"], t["topic_id"], {**m, "from_pk": ev["pubkey"], "files": files,
                                                            "event_id": ev["id"]},
                                expect_reply=(typ == "request"))
@@ -488,6 +503,14 @@ class Bridge:
         return out
 
     # delivery to local agents ---------------------------------------------------------------------
+    def asked(self, agent: str, topic_id: str, task_id: str | None) -> bool:
+        """True if `agent` sent the request that opened this task."""
+        if not task_id or agent not in self.agent_pks:
+            return False
+        return self.db.execute(
+            "SELECT 1 FROM messages WHERE topic_id=? AND task_id=? AND type='request' AND direction='out' AND from_pk=?",
+            (topic_id, task_id, self.agent_pks[agent])).fetchone() is not None
+
     def add_route(self, topic_id: str, agent: str):
         sid = str(uuid.uuid5(SESSION_NS, f"{topic_id}/{agent}"))
         self.db.execute("INSERT OR IGNORE INTO routes VALUES(?,?,?,0,?)", (topic_id, agent, sid, int(time.time())))
